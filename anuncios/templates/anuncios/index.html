@@ -1,0 +1,352 @@
+{% extends 'layouts/base.html' %}
+{% block javascripts %}
+<style>
+    body {
+        background-color: #e1f1fd;
+        margin: 0;
+    }
+
+    .circle {
+        width: 35px;
+        height: 35px;
+        border-radius: 50%;
+        background-color: #e0e0e0;
+        position: relative;
+        overflow: hidden;
+        display: inline-block;
+        vertical-align: top;
+    }
+
+    .more-content {
+        clear: both;
+        text-align: right;
+    }
+
+    .fill {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        border-radius: 50%;
+        background-color: #3498db;
+    }
+
+    .card {
+    margin-top: -10px;
+    margin-left: 50px;
+    border-radius: 15px;
+    box-shadow: 0px 0px 10px 0px rgba(0, 0, 0, 0.1);
+    background-color: #fff;
+    border: 1px solid #ccc;
+}
+
+
+    .table th,
+    .table td {
+        text-align: center;
+    }
+
+    .status-circle {
+        width: 15px;
+        height: 15px;
+        border-radius: 50%;
+        display: inline-block;
+        margin-right: 5px;
+    }
+
+    .table td.video-cell {
+        text-align: left;
+        vertical-align: top;
+        display: flex;
+        align-items: center;
+    }
+
+    .video-wrapper {
+        margin-right: 10px; /* Ajusta el margen derecho según sea necesario */
+    }
+
+    .status-online {
+        background-color: #28a745;
+    }
+
+    .status-offline {
+        background-color: #dc3545;
+    }
+
+    .section-heading {
+        margin-bottom: 20px;
+        border-bottom: 2px solid #ddd;
+        padding-bottom: 10px;
+    }
+
+    .table-section {
+        margin-top: 20px;
+    }
+
+    .btn-add {
+        position: fixed;
+        bottom: 50px;
+        right: 50px;
+        z-index: 1000;
+        width: 50px;
+        height: 50px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        overflow: hidden;
+    }
+
+    .btn-add .icon {
+        font-size: 24px;
+        color: white;
+        text-decoration: none;
+        position: relative;
+        top: -1px;
+        z-index: 1;
+    }
+
+    .btn-add .background {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        border-radius: 50%;
+        background-color: #B4ADEA;
+        transition: background-color 0.3s ease;
+    }
+
+    .btn-add:hover .background {
+        background-color: #8568B2;
+    }
+
+    .acciones-container {
+        display: flex;
+        justify-content: space-around;
+    }
+
+    .acciones-container a {
+        color: white;
+    }
+
+    .acciones-container a:hover {
+        text-decoration: none;
+    }
+    
+</style>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+<script>
+    function eliminarAnuncio(id) {
+        Swal.fire({
+            title: "¿Estás seguro?",
+            text: "Esta acción no se puede deshacer",
+            icon: "question",
+            showCancelButton: true,
+            cancelButtonText: "No, Cancelar",
+            confirmButtonText: "Sí, Eliminar",
+            reverseButtons: true,
+            confirmButtonColor: "darkred"
+        }).then(function (result) {
+            if (result.isConfirmed) {
+                window.location.href = "eliminar/" + id;
+            }
+        });
+    }
+
+    $(document).ready(function() {
+        $('video').hover(function() {
+            this.play();
+        }, function() {
+            this.pause();
+        });
+    });
+</script>
+{% endblock %}
+
+{% block content %}
+{% load humanize %}
+
+<div class="card">
+    <div class="card-body">
+        <h1 class="page-title ng-binding">Anuncios</h1>
+        <div class="table-responsive">
+            <table class="table full-width-table">
+                <thead>
+                    <tr>
+                        <th>VIDEO Y NOMBRE</th>
+                        <th>TIPO</th>
+                        <th>CARPETA</th>
+                        <th>ALTA</th>
+                        <th>LISTO</th>
+                        <th>ACC</th>
+
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for anuncio in anuncios %}
+                        <tr>
+                            <td class="video-cell">
+                                <div class="video-wrapper">
+                                    {% if anuncio.file %}
+                                    {% if anuncio.file.url|lower|slice:'-4:' == ".mp4" or anuncio.file.url|lower|slice:'-5:' == ".webm" or anuncio.file.url|lower|slice:'-4:' == ".ogg" %}
+                                    <video width="60" height="30" loop muted style="outline: none;">
+                                        <source src="{{ anuncio.file.url }}" type="video/mp4">
+                                        Tu navegador no admite el elemento de video.
+                                    </video>
+                                    {% else %}
+                                    <img src="{{ anuncio.file.url }}" alt="{{ anuncio.nombre }}" class="img-thumbnail video-thumbnail" width="60" height="30">
+                                    {% endif %}
+                                    {% else %}
+                                    <p>No hay archivo adjunto</p>
+                                    {% endif %}
+                                </div>
+                                <div>
+                                    <a href="{% url 'editar_anuncio' anuncio.id %}">{{ anuncio.nombre }}</a>
+                                </div>
+                            </td>
+                            <td>{{ anuncio.tipo }}</td>
+                            <td>{{ anuncio.carpeta_id|default:"-----" }}</td>
+                            <td>{{ anuncio.alta|date:"d/m/Y H:i" }}</td>
+                            <td class="text-center">
+                                {% if anuncio.listo %}
+                                    <input type="checkbox" checked disabled>
+                                {% else %}
+                                    <input type="checkbox" disabled>
+                                {% endif %}
+                            </td>
+                            <td class="text-center">
+                                <a href="#" onclick="eliminarAnuncio({{ anuncio.id }})" class="btn btn-danger btn-sm">Eliminar</a>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+                
+            </table>
+        </div>
+        <div>
+            {% include 'layouts/paginator.html' %}
+        </div>
+    </div>
+</div>
+<!-- Add this code at the end of the body section of your HTML, before the closing </body> tag -->
+<div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Agregar Anuncio</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form method="post" enctype="multipart/form-data" action="{% url 'agregar_anuncio' %}">
+                    {% csrf_token %}
+                    <div class="form-group">
+                        <label for="nombre">Nombre:</label>
+                        <input type="text" class="form-control" id="nombre" name="nombre" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="tipo">Tipo:</label>
+                        <select class="form-control" id="tipo" name="tipo" required>
+                            <option value="Archivo">Archivo</option>
+                            <option value="Widgets">Widgets</option>
+                            <option value="Lista Inteligente">Lista Inteligente</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="file">Archivo:</label>
+                        <div class="custom-file">
+                            <input type="file" class="custom-file-input" id="file" name="file" accept="video/*, image/*" onchange="previewFile()">
+                            <label class="custom-file-label" for="file">Seleccionar Archivo</label>
+                        </div>
+                    </div>
+                    <div id="preview-container" class="mt-3">
+                        <div id="file-preview" class="file-preview-container">
+                            <p class="file-preview-text">Agrega imagen o video</p>
+                        </div>
+                    </div>
+                    
+                    <div class="form-check">
+                        <input type="checkbox" class="form-check-input" id="audio_en_video" name="audio_en_video">
+                        <label class="form-check-label" for="audio_en_video">Audio en Video</label>
+                    </div>
+                    <!-- Add more form fields as needed -->
+
+                    <button type="submit" class="btn btn-primary">Guardar Anuncio</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    function previewFile() {
+        var previewContainer = document.getElementById('file-preview');
+        var fileInput = document.querySelector('input[type=file]');
+        var file = fileInput.files[0];
+
+        if (file) {
+            var fileType = file.type.split('/')[0];
+
+            if (fileType === 'video') {
+                var video = document.createElement('video');
+                video.src = URL.createObjectURL(file);
+                video.width = 300;
+                video.height = 150;
+                video.controls = true;
+                video.classList.add('file-preview-content');
+                previewContainer.innerHTML = '';
+                previewContainer.appendChild(video);
+                video.play();
+            } else if (fileType === 'image') {
+                var img = document.createElement('img');
+                img.src = URL.createObjectURL(file);
+                img.width = 300;
+                img.height = 150;
+                img.classList.add('file-preview-content');
+                previewContainer.innerHTML = '';
+                previewContainer.appendChild(img);
+            } else {
+                previewContainer.innerHTML = 'Tipo de archivo no compatible';
+            }
+        } else {
+            previewContainer.innerHTML = '<p class="file-preview-text">Agrega imagen o video</p>';
+        }
+    }
+</script>
+<style>
+    .file-preview-container {
+        width: 300px;
+        height: 150px;
+        border: 2px dashed #3498db;
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        position: relative;
+        overflow: hidden;
+        transition: background-color 0.3s ease;
+        cursor: pointer;
+    }
+
+    .file-preview-text {
+        color: #3498db;
+        text-align: center;
+    }
+
+    .file-preview-content {
+        max-width: 100%;
+        max-height: 100%;
+    }
+</style>
+
+<!-- Update the link in your template -->
+<a href="#" class="btn-add" data-toggle="modal" data-target="#myModal">
+    <span class="icon"><i class="fas fa-plus"></i></span>
+    <span class="background"></span>
+</a>
+
+
+{% endblock %}

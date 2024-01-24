@@ -1,0 +1,881 @@
+{% extends 'layouts/base.html' %} {% block javascripts %}
+<style>
+
+  body{
+    background-color: #e1f1fd;
+  }
+.input-preview__src {
+	display: none;
+}
+
+
+.input-preview {
+	border: dashed black 0.175em;
+	border-radius: 0.5em;
+	width: 55vw;
+	height: 200px;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	background-size: contain;
+	background-repeat: no-repeat;
+	background-position: center;
+	position: relative;
+	transition: ease-in-out 750ms;
+}
+
+.input-preview::after {
+	position: absolute;
+	top: 50%;
+	left: 0;
+	width: 100%;
+	text-align: center;
+	transform: translateY(50%);
+	content: "selecciona una Imagen..";
+	font-style: italic;
+	font-size: 1em;
+}
+
+
+.has-image::before {
+	position: absolute;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+	background: rgba(50, 50, 50, 0.5);
+	content: " ";
+	transition: ease-in-out 750ms;
+}
+
+.has-image::after {
+	color: white;
+}
+.btn-acciones-custom {
+  background-color: transparent;
+  border: none;
+  font-size: 14px; /* Ajusta el tamaño del texto según tu preferencia */
+  margin-right: 10px; /* Ajusta el margen derecho según tu preferencia */
+  cursor: pointer;
+}
+
+.btn-acciones-custom:hover {
+  color: #007bff; /* Cambia el color al pasar el ratón si lo deseas */
+}
+
+
+  .circle {
+    width: 35px;
+    height: 35px;
+    border-radius: 50%;
+    background-color: #e0e0e0;
+    position: relative;
+    overflow: hidden;
+    display: inline-block;
+    vertical-align: top;
+  }
+
+
+
+  .fill {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    background-color: #3498db;
+  }
+
+  .card {
+    margin-top: -10px;
+    margin-left: 50px;
+    border-radius: 15px;
+    background-color: #fff;
+    border: 1px solid #ccc;
+    box-shadow: 0px 0px 10px 0px rgba(0, 0, 0, 0.1);
+
+    padding: 20px; /* Ajusta el espaciado interno según sea necesario */
+
+  }
+  .select-box {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-right: 20px; /* Ajusta el margen derecho según sea necesario */
+  }
+  .select-box label {
+    margin-bottom: 10px; /* Ajusta el espaciado inferior de las etiquetas según sea necesario */
+  }
+
+
+  .table th,
+  .table td {
+    text-align: left;
+    border: none; /* Agrega esta línea para quitar el borde de las celdas */
+  }
+  .table td {
+    text-align: left; /* Alinea el contenido de las celdas a la izquierda */
+  }
+
+  .table td i {
+    margin-left: 5px; /* Ajusta el margen izquierdo del ícono de lápiz */
+  }
+
+  .table tbody tr {
+    border-bottom: none; /* Agrega esta línea para quitar la línea de separación entre las filas */
+  }
+
+  .status-circle {
+    width: 15px;
+    height: 15px;
+    border-radius: 50%;
+    display: inline-block;
+    margin-right: 5px;
+  }
+
+  .status-online {
+    background-color: #28a745;
+  }
+
+  .status-offline {
+    background-color: #dc3545;
+  }
+
+  .section-heading {
+    margin-bottom: 20px;
+    border-bottom: 2px solid #ddd;
+    padding-bottom: 10px;
+  }
+
+  .table-section {
+    margin-top: 20px;
+  }
+
+  .btn-add {
+    position: fixed;
+    bottom: 50px;
+    right: 50px;
+    z-index: 1000;
+    width: 50px;
+    height: 50px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    overflow: hidden;
+    transition: bottom 0.3s ease; /* Añade una transición para el desplazamiento */
+  }
+
+  .btn-add .icon {
+    font-size: 24px;
+    color: white;
+    text-decoration: none;
+    position: relative;
+    top: -1px;
+    z-index: 1;
+  }
+
+  .btn-add .background {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    background-color: #b4adea;
+    transition: background-color 0.3s ease;
+  }
+
+  .btn-add:hover .background {
+    background-color: #8568b2;
+    transition: background-color 0.3s ease;
+  }
+  .btn-add.clicked {
+    bottom: 100px; /* Ajusta la posición hacia arriba al hacer clic en las casillas */
+  }
+  /* Nueva clase para el botón de "+" */
+  .btn-plus {
+    cursor: pointer;
+    background-color: #3498db;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    padding: 5px 10px;
+    font-size: 16px;
+  }
+
+  /* Nueva clase para el área de acciones dentro de la barra desplegable */
+  .acciones-container {
+    display: flex;
+    justify-content: space-around;
+  }
+
+  .acciones-container a {
+    color: white;
+  }
+  .btn-search {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 0;
+  }
+  
+
+  .btn-search .icon {
+    font-size: 16px;
+    color: #3498db;
+    text-decoration: none;
+    position: relative;
+    top: -1px;
+    z-index: 1;
+  }
+
+  .btn-search .background {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    background-color: transparent;
+    transition: background-color 0.3s ease;
+  }
+
+  .btn-search:hover .background {
+    background-color: transparent;
+  }
+
+  .acciones-container a:hover {
+    text-decoration: none;
+  }
+  #mas_opciones {
+    text-align: center;
+    margin-top: 10px;
+  }
+
+  #mas_opciones button {
+    color: #333; /* Color del texto */
+    background-color: transparent; /* Fondo transparente */
+    border: none; /* Sin borde */
+    padding: 0; /* Sin relleno */
+    font-size: 14px; /* Tamaño de fuente ajustable */
+  }
+
+  .encendido-todo-dia {
+    margin-left: 30px; /* Ajusta el valor según sea necesario para lograr el espaciado deseado */
+  }
+  .page-title {
+  margin-top: 0px; /* Ajusta el valor según sea necesario para mover el encabezado hacia arriba */
+}
+
+  #opcionesCollapse {
+    margin-top: 10px;
+  }
+</style>
+<script>
+  // Nueva función para manejar el clic en las casillas
+  function toggleCheckbox(clickedElement) {
+    clickedElement.classList.toggle("selected");
+
+    // Verificar si al menos una casilla está seleccionada para animar el botón de agregar
+    var checkboxes = document.querySelectorAll('.select-box input[type="checkbox"]');
+    var addButton = document.querySelector('.btn-add');
+
+    for (var i = 0; i < checkboxes.length; i++) {
+      if (checkboxes[i].checked) {
+        addButton.classList.add('clicked');
+        return;
+      }
+    }
+
+    // Si ninguna casilla está seleccionada, restablecer la posición del botón
+    addButton.classList.remove('clicked');
+  }
+</script>
+<script>
+  function searchPantallas() {
+    // Obtén el valor de búsqueda desde el input
+    var searchTerm = document.getElementById('searchInput').value.toLowerCase();
+
+    // Obtén todas las filas de la tabla de pantallas
+    var rows = document.querySelectorAll('.table tbody tr');
+
+    // Recorre todas las filas y muestra/oculta según el término de búsqueda
+    rows.forEach(function (row) {
+      var nombre = row.querySelector('td a').innerText.toLowerCase();
+
+      // Muestra la fila si el término de búsqueda está contenido en el nombre
+      if (nombre.includes(searchTerm)) {
+        row.style.display = 'table-row';
+      } else {
+        row.style.display = 'none';
+      }
+    });
+  }
+</script>
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+<script>
+  function toggleMore(id) {
+    $("#" + id).slideToggle();
+    toggleButton(id);
+  }
+
+  function eliminarPantalla(id) {
+    Swal.fire({
+      title: "¿Estás seguro?",
+      text: "Esta acción no se puede deshacer",
+      icon: "question",
+      showCancelButton: true,
+      cancelButtonText: "No, Cancelar",
+      confirmButtonText: "Sí, Eliminar",
+      reverseButtons: true,
+      confirmButtonColor: "darkred",
+    }).then(function (result) {
+      if (result.isConfirmed) {
+        window.location.href = "eliminar/" + id;
+      }
+    });
+  }
+
+  function toggleButton(id) {
+    var button = $("#btn-acciones" + id);
+    var content = $("#detalle" + id);
+    if (content.is(":visible")) {
+      button.text("-");
+    } else {
+      button.text("+");
+    }
+  }
+
+  // Nueva función para manejar la edición de la programática
+  function editarProgramatica(id) {
+    // Puedes implementar la lógica de edición aquí
+    // Por ejemplo, puedes abrir un modal o redirigir a una página de edición
+    console.log("Editar programática para el ID:", id);
+  }
+</script>
+{% endblock %} {% block content %} {% load humanize %}
+<div class="card">
+
+  <div class="card-body" style="display: flex; justify-content: space-between; align-items: center;">
+    <h1 class="page-title ng-binding" style="margin: 0;">Pantallas</h1>
+
+    <!-- Mueve el search-bar dentro del card-body -->
+    <div class="search-bar" style="pointer-events: none; display: flex; align-items: center;">
+      <input type="text" id="searchInput" placeholder="Buscar por nombre..." style="pointer-events: auto;" onkeydown="handleSearchInput(event)" />
+      <button class="btn-search" onclick="searchPantallas()">
+        <span class="icon"><i class="fas fa-search"></i></span>
+        <span class="background"></span>
+      </button>
+    </div>
+  </div>
+
+  <script>
+    function handleSearchInput(event) {
+      if (event.key === 'Enter') {
+        event.preventDefault(); // Evitar la recarga de la página por el evento Enter
+        searchPantallas();
+      }
+    }
+  </script>
+
+    <div class="table-responsive">
+      <table class="table full-width-table">
+        <thead>
+          <tr>
+            <th style="text-align: left">NOMBRE</th>
+            <th>OCUPACIÓN</th>
+            <th>ESTADO</th>
+            <th>Venta</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for pantalla in pantallas %}
+          <tr>
+            <td colspan="3">
+              <a href="{% url 'editar_pantalla' pantalla.id %}">
+                <!-- Verificar si hay una imagen asociada -->
+                {% if pantalla.imagen %}
+                  <img src="{{ pantalla.imagen.url }}" alt="{{ pantalla.nombre }}" width="50" height="50" />
+                  <!-- Depuración del nombre -->
+                  {{ pantalla.nombre }}
+                {% else %}
+                  <p>No hay imagen</p>
+                {% endif %}
+                
+                <!-- Mostrar el Nombre -->
+              </a>
+            </td>
+            <!-- Botones de "+" para mostrar más información -->
+            <td>
+              <button id="btn-acciones{{ pantalla.id }}" class="btn-acciones-custom" onclick="toggleMore('detalle{{ pantalla.id }}')">
+                +
+              </button>
+            </td>
+          </tr>
+          
+          <!-- Detalles de la resolución ocultos por defecto -->
+          <tr class="more-content" id="detalle{{ pantalla.id }}" style="display: none; overflow: hidden; height: 0; transition: height 0.5s ease;">
+            <td colspan="4">
+              <!-- Información de resolución a la izquierda -->
+              <div style="width: 100%">
+                <strong>Resolución:</strong> {{ pantalla.ancho_en_pixeles }} x {{ pantalla.alto_en_pixeles }} pixels
+              </div>
+              <!-- Área de acciones debajo de la resolución -->
+              <div class="acciones-container" style="margin-top: 10px;">
+                <a href="{% url 'editar_pantalla' pantalla.id %}" class="btn btn-info btn-sm">
+                  <i class="fas fa-edit"></i> Editar
+                </a>
+                <a href="#" onclick="eliminarPantalla({{ pantalla.id }})" class="btn btn-danger btn-sm">
+                  <i class="fas fa-trash-alt"></i> Eliminar
+                </a>
+                
+              </div>
+            </td>
+          </tr>
+          
+        {% endfor %}
+
+                  
+        </tbody>
+        
+      </table>
+    </div>
+    <div>{% include 'layouts/paginator.html' %}</div>
+  </div>
+</div>
+<style>
+  .modal-body {
+    border: 0;
+  }
+  .modal-body form {
+    margin-right: 20px; /* Ajusta el margen derecho del formulario */
+    margin-left: 100px; /* Ajusta el margen izquierdo del formulario */
+    border: 0; /* Elimina cualquier borde en el cuerpo del modal */
+    margin: 0; /* Elimina cualquier margen en el formulario dentro del modal */
+  }
+
+  .modal-body .form-group {
+    margin-bottom: 50px; /* Espaciado inferior entre los elementos del formulario */
+    margin-bottom: 15px; /* Espaciado inferior entre los elementos del formulario */
+    border: 0;
+  }
+
+  .modal-body .encendido-todo-dia {
+    margin-left: 10px; /* Ajusta el margen izquierdo del texto "Encendido todo el día" */
+  }
+
+  .modal-body button.btn-link {
+    margin-left: 5px; /* Ajusta el margen izquierdo de los botones de edición */
+  }
+  .form-group label {
+    margin-bottom: 0; /* Elimina el margen inferior de las etiquetas */
+  }
+
+  .form-control {
+    border: 1px solid #ced4da; /* Puedes establecer el borde a 0 si es necesario */
+  }
+  .modal-body button.btn-primary {
+    margin-bottom: 0;
+  }
+  .modal-header {
+    border-bottom: 0; /* Elimina el borde inferior del encabezado del modal */
+  }
+
+  .modal-body {
+    padding-top: 0; /* Ajusta el espacio superior del cuerpo del modal si es necesario */
+  }
+</style>
+
+<!-- Formulario Django -->
+<div
+  class="modal fade"
+  id="miModal"
+  tabindex="-1"
+  role="dialog"
+  aria-labelledby="miModalLabel"
+  aria-hidden="true"
+>
+  <div class="modal-dialog modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title text-center" id="miModalLabel">
+          Agregar Pantalla
+        </h5>
+        <button
+          type="button"
+          class="close"
+          data-dismiss="modal"
+          aria-label="Close"
+        >
+          <span aria-hidden="true">×</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <form action="{% url 'agregar_pantalla' %}" method="post" enctype="multipart/form-data">
+          {% csrf_token %}
+      
+          <div class="form-group">
+            <label class="input-preview" for="imagen">
+              <input class="input-preview__src" name="imagen" id="imagen" type="file"/ required>
+            </label>
+          </div>      
+          <div class="form-group">
+            <label for="nombre">Nombre:</label>
+            <input type="text" class="form-control" id="nombre" name="nombre" required>
+        </div>
+          <div class="form-group">
+            <input type="checkbox" id="estado" name="estado" / required>
+            <label for="martes">estado</label>
+          </div>
+
+          <div class="form-group">
+            <label for="resolucion" class="text-center">Resolución</label>
+            <p id="resolucion" class="text-center"></p>
+          </div>
+
+          <div class="row text-center">
+            <div class="col-md-4" onclick="llenarCampos(1920, 1080)">
+              <div class="cuadro">
+                <div class="icono-circulo">
+                  <i class="far fa-square fa-3x"></i>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-4" onclick="llenarCampos(1280, 720)">
+              <div class="cuadro">
+                <div class="icono-circulo icono-cuadrado">
+                  <i class="far fa-square fa-3x"></i>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-4" onclick="llenarCampos(800, 600)">
+              <div class="cuadro">
+                <div class="icono-circulo icono-horizontal">
+                  <i class="far fa-square fa-3x"></i>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group col-md-6">
+              <label for="ancho_en_pixeles" class="text-center"
+                >Ancho en Pixeles</label
+              >
+              <input
+                type="number"
+                class="form-control"
+                id="ancho_en_pixeles"
+                name="ancho_en_pixeles"
+              / required>
+            </div>
+            <div class="form-group col-md-6">
+              <label for="alto_en_pixeles" class="text-center"
+                >Alto en Pixeles</label
+              >
+              <input
+                type="number"
+                class="form-control"
+                id="alto_en_pixeles"
+                name="alto_en_pixeles"
+              />
+            </div>
+          </div>
+
+          <style>
+            .cuadro {
+              display: flex;
+              align-items: center;
+              justify-content: center;
+              margin-bottom: 5px;
+            }
+
+            .icono-circulo {
+              display: flex;
+              align-items: center;
+              justify-content: center;
+              background-color: rgba(0, 0, 255, 0.082);
+              border-radius: 50%;
+              padding: 20px;
+            }
+
+            .icono-circulo i {
+              font-size: 5em;
+              color: #000;
+            }
+
+            .icono-cuadrado i {
+              transform: scaleY(1.5);
+            }
+
+            .icono-horizontal i {
+              transform: scaleX(1.5);
+            }
+          </style>
+
+          <!-- Script JavaScript para llenar campos -->
+          <script>
+            function llenarCampos(ancho, alto) {
+              document.getElementById("ancho_en_pixeles").value = ancho;
+              document.getElementById("alto_en_pixeles").value = alto;
+            }
+          </script>
+
+          <div class="form-group">
+            <label for="mapa" class="text-center">Ubicacion</label>
+            <div id="mapa" style="height: 400px; width: 100%"></div>
+            <script>
+              function initMap() {
+                var uluru = { lat: -25.344, lng: 131.036 };
+                var map = new google.maps.Map(document.getElementById("mapa"), {
+                  zoom: 4,
+                  center: uluru,
+                });
+                var marker = new google.maps.Marker({
+                  position: uluru,
+                  map: map,
+                });
+              }
+            </script>
+            <script
+              async
+              defer
+              src="https://maps.googleapis.com/maps/api/js?key=API_KEY&callback=initMap"
+            ></script>
+          </div>
+
+          <div class="form-group">
+            <label for="tiempo_espacio" class="text-center"
+              >Tiempo de cada espacio (seg)</label
+            >
+            <input
+              type="number"
+              class="form-control"
+              id="tiempo_espacio"
+              name="tiempo_cada_espacio_seg"
+            />
+          </div>
+          <div class="form-group">
+            <label for="espacios_publicitarios" class="text-center"
+              >Nro espacios publicitarios</label
+            >
+            <input
+              type="number"
+              class="form-control"
+              id="espacios_publicitarios"
+              name="nro_espacios_publicitarios"
+            />
+          </div>
+          <div class="form-group">
+            <label for="salidas_minimas" class="text-center"
+              >Salidas mínimas por hora</label
+            >
+            <input
+              type="number"
+              class="form-control"
+              id="salidas_minimas"
+              name="salidas_minimas_por_hora"
+              readonly
+              title="Ingresá tiempo y cantidad de espacios para ver las salidas por hora"
+              class="custom-tooltip"
+            />
+          </div>
+
+          <div class="form-group" id="mas_opciones">
+            <button
+              type="button"
+              class="btn btn-link"
+              data-toggle="collapse"
+              data-target="#opcionesCollapse"
+              aria-expanded="false"
+              aria-controls="opcionesCollapse"
+            >
+              Más opciones
+            </button>
+          </div>
+
+          <div class="collapse" id="opcionesCollapse">
+            <!-- Días de la semana -->
+            <div class="form-group">
+              <input type="checkbox" id="lunes" name="lunes" />
+              <label for="lunes">Lunes</label>
+              <span class="encendido-todo-dia">(Encendido todo el día)</span>
+              <button
+                type="button"
+                class="btn btn-link"
+                data-toggle="collapse"
+                data-target="#horariosLunes"
+                aria-expanded="false"
+                aria-controls="horariosLunes"
+              >
+                <i class="fas fa-pencil-alt"></i>
+                
+              </button>
+
+            </div>
+            <div class="form-group">
+              <input type="checkbox" id="martes" name="martes" />
+              <label for="martes">Martes</label>
+              <span class="encendido-todo-dia">(Encendido todo el día)</span>
+              <button
+                type="button"
+                class="btn btn-link"
+                data-toggle="collapse"
+                data-target="#horariosMartes"
+                aria-expanded="false"
+                aria-controls="horariosMartes"
+              >
+                <i class="fas fa-pencil-alt"></i>
+              </button>
+            </div>
+            <div class="form-group">
+              <input type="checkbox" id="miercoles" name="miercoles" />
+              <label for="miercoles">Miércoles</label>
+              <span class="encendido-todo-dia">(Encendido todo el día)</span>
+              <button
+                type="button"
+                class="btn btn-link"
+                data-toggle="collapse"
+                data-target="#horariosMiercoles"
+                aria-expanded="false"
+                aria-controls="horariosMiercoles"
+              >
+                <i class="fas fa-pencil-alt"></i>
+              </button>
+            </div>
+            <div class="form-group">
+              <input type="checkbox" id="jueves" name="jueves" />
+              <label for="jueves">Jueves</label>
+              <span class="encendido-todo-dia">(Encendido todo el día)</span>
+              <button
+                type="button"
+                class="btn btn-link"
+                data-toggle="collapse"
+                data-target="#horariosJueves"
+                aria-expanded="false"
+                aria-controls="horariosJueves"
+              >
+                <i class="fas fa-pencil-alt"></i>
+              </button>
+            </div>
+            <div class="form-group">
+              <input type="checkbox" id="viernes" name="viernes" />
+              <label for="viernes">Viernes</label>
+              <span class="encendido-todo-dia">(Encendido todo el día)</span>
+              <button
+                type="button"
+                class="btn btn-link"
+                data-toggle="collapse"
+                data-target="#horariosViernes"
+                aria-expanded="false"
+                aria-controls="horariosViernes"
+              >
+                <i class="fas fa-pencil-alt"></i>
+              </button>
+            </div>
+            <div class="form-group">
+              <input type="checkbox" id="sabado" name="sabado" />
+              <label for="sabado">Sábado</label>
+              <span class="encendido-todo-dia">(Encendido todo el día)</span>
+              <button
+                type="button"
+                class="btn btn-link"
+                data-toggle="collapse"
+                data-target="#horariosSabado"
+                aria-expanded="false"
+                aria-controls="horariosSabado"
+              >
+                <i class="fas fa-pencil-alt"></i>
+              </button>
+            </div>
+            <div class="form-group">
+              <input type="checkbox" id="domingo" name="domingo" />
+              <label for="domingo">Domingo</label>
+              <span class="encendido-todo-dia">(Encendido todo el día)</span>
+              <button
+                type="button"
+                class="btn btn-link"
+                data-toggle="collapse"
+                data-target="#horariosDomingo"
+                aria-expanded="false"
+                aria-controls="horariosDomingo"
+              >
+                <i class="fas fa-pencil-alt"></i>
+              </button>
+            </div>
+          </div>
+          <button type="submit" class="btn btn-primary mx-auto d-block">
+            Guardar
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+
+<script>
+  $(document).ready(function () {
+    // Función para calcular las salidas mínimas por hora
+    function calcularSalidasMinimas() {
+      // Obtener valores de tiempo_espacio y espacios_publicitarios
+      var tiempoEspacio = parseInt($("#tiempo_espacio").val()) || 0;
+      var espaciosPublicitarios =
+        parseInt($("#espacios_publicitarios").val()) || 0;
+
+      // Calcular salidas mínimas por hora
+      var salidasMinimas =
+        tiempoEspacio !== 0
+          ? Math.round(3600 / (tiempoEspacio * espaciosPublicitarios))
+          : 0;
+
+      // Mostrar el resultado en el campo salidas_minimas
+      $("#salidas_minimas").val(salidasMinimas);
+    }
+
+    // Asociar la función al evento de cambio en los campos relevantes
+    $("#tiempo_espacio, #espacios_publicitarios").change(function () {
+      calcularSalidasMinimas();
+    });
+
+    // Llamar a la función al cargar la página para establecer un valor inicial si es necesario
+    calcularSalidasMinimas();
+  });
+</script>
+
+<script>
+const fileImage = document.querySelector('.input-preview__src');
+const filePreview = document.querySelector('.input-preview');
+
+fileImage.onchange = function () {
+    const reader = new FileReader();
+
+    reader.onload = function (e) {
+        // get loaded data and render thumbnail.
+        filePreview.style.backgroundImage  = "url("+e.target.result+")";
+        filePreview.classList.add("has-image");
+    };
+
+    // read the image file as a data URL.
+    reader.readAsDataURL(this.files[0]);
+};
+</script>
+
+<a href="#" class="btn-add" data-toggle="modal" data-target="#miModal">
+  <span class="icon"><i class="fas fa-plus"></i></span>
+  <span class="background"></span>
+</a>
+
+<link
+  rel="stylesheet"
+  href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css"
+  integrity="sha512-dTfge/zgo9Gu5w83YFvY0RNiJJWGV0aKXAZFfE7P5hjKgICrL1b3l9MpqX5F5F4rbcv6D4qLZQulT6b1QVXzk4Q=="
+  crossorigin="anonymous"
+/>
+
+{% endblock %}

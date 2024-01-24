@@ -1,0 +1,233 @@
+  <!-- anuncios/resumen.html -->
+  {% extends 'layouts/base.html' %} {% block content %}
+  <style>
+    body {
+      background-color: #e1f1fd;
+    }
+
+    .contenedor-cuadrados {
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      flex-wrap: wrap;
+    }
+    #myPieChart {
+      width: 400px;  /* Ajusta este valor según tu preferencia */
+      height: 200px; /* Ajusta este valor según tu preferencia */
+      margin-right: 100px;
+    }
+    
+
+    .hoja {
+      display: flex;
+      width: 400px;
+      height: 200px;
+      background-color: #fff;
+      border: 1px solid #ccc;
+      margin: 15px;
+      padding: 20px;
+      text-align: center;
+      border-radius: 15px;
+      box-shadow: 0px 0px 10px 0px rgba(0, 0, 0, 0.1);
+    }
+
+    .contenido {
+      flex: 1;
+      text-align: left;
+      margin-right: 20px;
+    }
+
+    .grafico {
+      width: 100px;
+      height: 100px;
+      background-color: #3498db;
+      border-radius: 50%;
+    }
+
+    .icono-mensaje {
+      font-size: 36px;
+      color: #3498db;
+    }
+
+    .hoja-busqueda {
+      display: flex;
+      width: 98%;
+      background-color: #fff;
+      border: 1px solid #ccc;
+      margin: 15px;
+      padding: 20px;
+      text-align: center;
+      border-radius: 15px;
+      box-shadow: 0px 0px 10px 0px rgba(0, 0, 0, 0.1);
+    }
+
+    .buscador {
+      width: 80%;
+      padding: 10px;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      margin-right: 10px;
+    }
+    .nombre {
+    color: #333; /* Cambiar el color del texto a tu preferencia */
+    margin-bottom: 5px;
+  }
+
+  /* Estilo cuando el mouse está sobre la hoja */
+  .hoja:hover {
+    border-bottom: 2px solid #3498db; /* Cambiar el color de la barra según tu preferencia */
+  }
+
+    .boton-buscar {
+      padding: 10px 20px;
+      background-color: #3498db;
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+    .content-container {
+          display: flex;
+          justify-content: space-between;
+          align-items: flex-start;
+          max-width: 1200px;
+          margin: 0 auto;
+      }
+
+      .anuncios-section {
+          width: 50%;
+      }
+
+      .map-section {
+          width: 50%;
+      }
+    .contenedor-horizontal {
+      display: flex;
+      justify-content: space-around;
+      align-items: flex-start;
+    }
+  </style>
+
+  <div class="contenedor-horizontal">
+    <div class="hoja">
+      <div class="contenido">
+        <h4>Pantallas Activas</h4>
+        {% for pantalla in pante_true %}
+        <!-- Aquí puedes mostrar detalles de cada pantalla activa si es necesario -->
+        {% endfor %}
+        <p style="font-size: 40px; text-align: center;">{{ pante_true.count }} / {{ pante_all.count }}</p>
+      </div>
+      <canvas id="myPieChart"></canvas> <!-- Removí los atributos de ancho y alto aquí -->
+    </div>
+
+    <div class="hoja">
+      <div class="contenido">
+        <h4>Espacios Publicitarios</h4>
+        <!-- Contenido de la hoja... -->
+      </div>
+    </div>
+    <div class="hoja">
+      <div class="contenido" >
+          <h2>Anuncios Activos</h2>
+          <p>Número de anuncios activos: {{ anuncios_activos_count }}</p>
+      </div>
+      <div class="icono-mensaje"><i class="fas fa-comment"></i></div>
+  </div>
+
+  </div>
+  </div>
+  <div class="hoja-busqueda">
+    <input type="text" id="buscador" class="buscador" placeholder="Buscar pantallas..." onkeyup="buscarPantalla()" />
+    <button class="boton-buscar">Buscar</button>
+  </div>
+
+  <!-- Nueva sección para mostrar pantallas con formato diferente -->
+ <!-- Nueva sección para mostrar pantallas con formato diferente -->
+ <div class="contenedor-cuadrados" style="display: flex; justify-content: flex-start; padding: 10px;">
+  {% for pantalla in pante_true %}
+    <a href="{% url 'mostrar_pantalla' pantalla.id %}"> <!-- Reemplaza 'mostrar_pantalla' con la URL real de tus detalles de pantalla y pasa el ID correcto -->
+      <div class="hoja" style="width:140px; height:200px; text-align: center; display: flex; flex-direction: column; align-items: center; position: relative;">
+        <!-- Verificar si hay una imagen asociada -->
+        {% if pantalla.imagen %}
+          <div class="imagen" style="margin-bottom: 10px;">
+            <img src="{{ pantalla.imagen.url }}" alt="{{ pantalla.nombre }}" style="width: 50px; height: 50px; border-radius: 50%;">
+          </div>
+        {% else %}
+          <p>No hay imagen</p>
+        {% endif %}
+        <div class="nombre">
+          <p>{{ pantalla.nombre }}</p>
+        </div>
+        <div class="icono-tarjeta">
+          <i class="fas fa-credit-card" style="color: blue;"></i>
+        </div>
+        <div class="estado" style="position: absolute; top: 0; right: 0; width: 20px; height: 20px; border-radius: 50%; background-color: {% if pantalla_true %}red{% else %}green{% endif %};"></div>
+      </div>
+    </a>
+  {% endfor %}
+</div>
+
+</div
+
+  <!-- Mover el script de Chart.js al final -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels"></script>
+  <script>
+    function buscarPantalla() {
+      var input, filter, contenedor, hojas, nombre, i, txtValue;
+      input = document.getElementById('buscador');
+      filter = input.value.toUpperCase();
+      contenedor = document.getElementById('contenedor-cuadrados');
+      hojas = contenedor.getElementsByClassName('hoja');
+    
+      for (i = 0; i < hojas.length; i++) {
+        nombre = hojas[i].getElementsByClassName('nombre')[0];
+        txtValue = nombre.textContent || nombre.innerText;
+        if (txtValue.toUpperCase().indexOf(filter) > -1) {
+          hojas[i].style.display = "";
+        } else {
+          hojas[i].style.display = "none";
+        }
+      }
+    }
+    </script>
+    
+  <script>
+    var ctx = document.getElementById('myPieChart').getContext('2d');
+
+    {% with pante_true_count=pante_true.count pante_all_count=pante_all.count %}
+      var porcentajeActivas = {{ pante_true_count|default:0 }} / {{ pante_all_count|default:1 }} * 100;
+    {% endwith %}
+
+    var porcentajeInactivas = 100 - porcentajeActivas;
+
+    var myPieChart = new Chart(ctx, {
+      type: 'doughnut',
+      data: {
+        labels: ['Activas', 'Inactivas'],
+        datasets: [{
+          data: [porcentajeActivas, porcentajeInactivas],
+          backgroundColor: ['#90e1ff', '#dcdbdc'],
+        }],
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        cutout: '50%',
+        plugins: {
+          datalabels: {
+            color: 'white',
+            formatter: function(value, context) {
+              if (context.chart.data.labels[context.dataIndex] === 'Activas') {
+                return 'Activas: ' + value.toFixed(2) + '%';
+              }
+            },
+            anchor: 'center',
+            align: 'center'
+          }
+        }
+      }
+    });
+  </script>
+
+  {% endblock %}

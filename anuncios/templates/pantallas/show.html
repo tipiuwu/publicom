@@ -1,0 +1,230 @@
+ {% extends 'layouts/base.html' %}
+
+{% block content %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<link rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
+    integrity="sha512-xxx" crossorigin="anonymous" />
+<div class="container">
+    <div class="row">
+        <div class="col-md-3">
+            <div class="card text-center">
+                <div class="card-body">
+                    <img src="{{ pantalla.imagen.url }}" width="100px"
+                        alt="{{ pantalla.nombre }}" class="img-fluid" />
+                    <h2 class="mt-2">{{ pantalla.nombre }}</h2>
+                    <p><strong></strong> {{ pantalla.ancho_en_pixeles }} x {{
+                        pantalla.alto_en_pixeles }} </p>
+                    <hr>
+                    <p style="font-size: 13px;">Tradicional (PE$ 8.000,00 /mes)
+                        Programáticas (PE$ 400,00 /CPM)</p>
+
+                    {% if pantalla.estado %}
+                    <p> Activo</p>
+                    {% else %}
+                    <p>Inactivo</p>
+                    {% endif %}
+
+                    <div class="d-flex justify-content-end">
+                        <a href="{% url 'lista_pantallas' %}"
+                            class="btn btn-primary btn-sm">Volver</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <div class="info-container">
+                <div class="button-container">
+                    <button onclick="mostrarInformacion()"
+                        class="nav-button">Información</button>
+                        
+                </div>
+
+                <div id="info-content">
+                    <canvas id="graficaSalidas"
+                        style="width: 300px; height: 114px;"></canvas>
+                </div>
+            </div>
+            
+        </div>
+    </div>
+    
+</div>
+
+  <!-- ... (otro contenido) ... -->
+  
+<style>
+        .pantalla-title {
+            margin-left: 120px;
+        }
+        .card-body-custom {
+        height: 300px; /* o la altura que desees */
+    }
+
+
+        body {
+            background-color: #e1f1fd;
+        }
+
+        .container {
+            margin-top: 50px;
+        }
+
+        .info-container {
+            border: 1px solid #ddd;
+            padding: 10px;
+            margin-top: 0px;
+            background-color: #ffffff;
+            width: 900px;
+        }
+
+        .button-container {
+            display: flex;
+        }
+
+        .nav-button {
+            background-color: transparent;
+            border: none;
+            cursor: pointer;
+            font-size: 16px;
+            padding: 0;
+            position: relative;
+            color: #333;
+            transition: color 0.3s ease;
+            outline: none;
+            margin-right: 25px;
+        }
+
+        .nav-button:hover,
+        .nav-button:focus {
+            color: #007bff;
+            outline: none;
+        }
+
+        .nav-button::after {
+            content: "";
+            display: block;
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background-color: #007bff;
+            transform: scaleX(0);
+            transform-origin: bottom right;
+            transition: transform 0.3s ease;
+        }
+
+        .nav-button:hover::after,
+        .nav-button:focus::after {
+            transform: scaleX(1);
+            transform-origin: bottom left;
+        }
+
+        .fa-circle-user {
+            color: #007bff;
+        }
+
+        .float-button {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+        }
+
+        .float-button button {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 10px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+
+    </style>
+
+<script>
+        var graficaMostrada = false;
+
+        var config = {
+            type: 'bar',
+            data: {
+                labels: ['Tiempo total en segundos'],
+                datasets: [{
+                    label: 'Salidas mínimas por hora',
+                    data: [],
+                    backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                    borderColor: 'rgba(75, 192, 192, 1)',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        };
+
+        function mostrarGrafica() {
+            var canvas = document.getElementById('graficaSalidas').getContext('2d');
+            var salidasMinimasPorHora = {{ pantalla.salidas_minimas_por_hora }};
+            var tiempoCadaEspacioSeg = {{ pantalla.tiempo_cada_espacio_seg }};
+            var tiempoTotalSeg = salidasMinimasPorHora * tiempoCadaEspacioSeg;
+
+            config.data.datasets[0].data = [tiempoTotalSeg];
+
+            if (!graficaMostrada) {
+                var myChart = new Chart(canvas, config);
+                graficaMostrada = true;
+            } else {
+                myChart.update();
+            }
+        }
+
+        function mostrarInformacion() {
+            mostrarGrafica();
+            document.getElementById('info-content').innerHTML = '<canvas id="graficaSalidas"></canvas>';
+            mostrarGrafica();
+        }
+
+        function mostrarOcupacion() {
+            document.getElementById('info-content').innerHTML = '<p>Esta es ocupación</p>';
+        }
+
+        function mostrarAudiencia() {
+            document.getElementById('info-content').innerHTML = '<p>Esta es audiencia</p>';
+        }
+    </script>
+
+<script>
+        document.getElementById('mostrarVideosBtn').addEventListener('click', function() {
+            // Lógica para cargar y mostrar los videos
+            fetch('/ruta-de-tu-vista-anuncio/')  // Reemplaza '/ruta-de-tu-vista-anuncio/' con la URL correcta
+                .then(response => response.json())
+                .then(data => {
+                    // Aquí maneja la respuesta y muestra los videos en la sección correspondiente
+                    var videosSection = document.getElementById('videosSection');
+                    videosSection.innerHTML = '';  // Limpia cualquier contenido previo
+
+                    data.anuncios_relacionados.forEach(function(anuncio) {
+                        var videoElement = document.createElement('video');
+                        videoElement.src = anuncio.file;
+                        videoElement.controls = true;
+                        videosSection.appendChild(videoElement);
+                    });
+
+                    videosSection.style.display = 'block';  // Muestra la sección de videos
+                })
+                .catch(error => console.error('Error:', error));
+        });
+    </script>
+
+<script async defer
+    src="https://maps.googleapis.com/maps/api/js?key=API_KEY&callback=initMap"></script>
+
+{% endblock %}
+

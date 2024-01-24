@@ -1,0 +1,309 @@
+{% extends 'layouts/base.html' %}
+
+{% block content %}
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
+
+<div class="row justify-content-center">
+    <!-- Cuadro izquierdo más pequeño -->
+    <div class="col-12 col-md-3">
+        <div class="card">
+            <div class="card-body text-center">
+                <!-- Lado izquierdo: Cuadro para el anuncio -->
+                <div class="video-container">
+                    <img src="{{ pantalla.imagen.url }}" width="170px"
+                        alt="{{ pantalla.nombre }}" class="img-fluid" />
+
+                        <p><strong>Resolución:</strong> {{ pantalla.ancho_en_pixeles }} x {{ pantalla.alto_en_pixeles }}</p>
+                        <hr>
+                        <div class="d-flex">
+                            <p style="font-size: 13px;">Tradicional (PE$ 8.000,00 /mes)</p>
+                            <div class="custom-control custom-switch ml-4">
+                                <input type="checkbox" class="custom-control-input" id="switchTradicional" {% if pantalla.tradicional_estado %} checked {% endif %}>
+                                <label class="custom-control-label" for="switchTradicional"></label>
+                            </div>
+                        </div>
+                        <div class="d-flex">
+                            <p style="font-size: 13px;">Programáticas (PE$ 400,00 /CPM) </p>
+                            <div class="custom-control custom-switch ml-4">
+                                <input type="checkbox" class="custom-control-input" id="switchProgramaticas" {% if pantalla.programaticas_estado %} checked {% endif %}>
+                                <label class="custom-control-label" for="switchProgramaticas"></label>
+                            </div>
+                        </div>
+    
+                        {% if pantalla.estado %}
+                        <p> Activo</p>
+                        {% else %}
+                        <p>Inactivo</p>
+                        {% endif %}
+    
+                        <div class="d-flex justify-content-end">
+                            <a href="{% url 'lista_pantallas' %}"
+                                class="btn btn-primary btn-sm">Volver</a>
+                        </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Cierre del cuadro izquierdo -->
+
+ 
+<div class="col-12 col-md-9">
+    <div class="card">
+        <div class="card-body">
+            <h5 class="card-title">Información</h5>
+
+            <!-- Cuadro azul con texto -->
+            <div class="info-box">
+                <h3 class="info-text">Ocupacion Actual</h3>
+            </div>
+
+            <div class="doughnut-chart-container" style="position: relative; float: left; background-color: white; padding: 10px;">
+                <!-- Agrega el texto en la esquina superior izquierda -->
+                <div style="position: absolute; top: 5px; left: 5px; font-size: 10px; color: gray;">Ocupación Actual</div>
+                <canvas id="myDoughnutChart" width="400" height="270"></canvas>
+            </div>
+
+
+            <div class="google-map-container" style="float: left; margin-top: 20px;">
+                <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d1938.000431163838!2d-76.20997991161889!3d-13.71839739097117!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x9110658e4c6a8de5%3A0x212f2858148d05c3!2sSENATI%20Pisco!5e0!3m2!1ses-419!2spe!4v1705968266917!5m2!1ses-419!2spe" width="650" height="278" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+            </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Script para inicializar la gráfica circular -->
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        // Datos de ejemplo (reemplaza esto con tus datos)
+        var porcentajeSalidas = 25; // Cambia esto según tus datos
+
+        // Configuración de la gráfica circular
+        var doughnutData = {
+            datasets: [{
+                data: [porcentajeSalidas, 100 - porcentajeSalidas],
+                backgroundColor: ['rgb(75, 192, 192)', 'rgb(255, 255, 25)']
+            }]
+        };
+
+        var doughnutOptions = {
+            cutoutPercentage: 80, // Ajusta según tus preferencias
+            responsive: true,
+            maintainAspectRatio: false
+        };
+
+        // Obtén el contexto del canvas y crea la gráfica circular
+        var doughnutChartCanvas = document.getElementById('myDoughnutChart').getContext('2d');
+        new Chart(doughnutChartCanvas, {
+            type: 'doughnut',
+            data: doughnutData,
+            options: doughnutOptions
+        });
+    });
+</script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script>
+    // Obtener el elemento de video
+    var video = document.getElementById('anuncioVideo');
+
+    // Cuando el metadato del video esté cargado
+    video.addEventListener('loadedmetadata', function () {
+        // Mostrar resolución y duración
+        document.getElementById('resolution').innerText = video.videoWidth + 'x' + video.videoHeight;
+        document.getElementById('duration').innerText = formatTime(video.duration);
+    });
+
+    // Función para formatear el tiempo en segundos a MM:SS
+    function formatTime(seconds) {
+        var minutes = Math.floor(seconds / 60);
+        var seconds = Math.floor(seconds % 60);
+
+        return padZero(minutes) + ':' + padZero(seconds);
+    }
+
+    // Función para añadir un cero delante si el número es menor que 10
+    function padZero(num) {
+        return (num < 10) ? '0' + num : num;
+    }
+</script>
+<style>
+    .video-container {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+    }
+
+    .details-container {
+        background-color: #f8fcfc; /* Agregado: Cambia el color de fondo a rojo */
+        padding: 10px; /* Agregado: Añade un relleno para resaltar el color */
+        border-radius: 8px; /* Agregado: Añade bordes redondeados para un mejor aspecto */
+    }
+
+    #resolution,
+    #duration {
+        display: block;
+        margin-top: 5px; /* Ajustado: Ajuste la separación entre Resolución y Duración */
+        /* Agregado: Cambia el color del texto a blanco para mayor contraste */
+    }
+
+    .info-box {
+        background-color: #3498db69;
+        color: #fff;
+        padding: 10px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .info-text {
+        margin: 0;
+    }
+
+    .video-icon {
+        width: 20px; /* Ajusta el tamaño según sea necesario */
+        height: 20px; /* Ajusta el tamaño según sea necesario */
+    }
+
+    .bar-chart {
+        /* Agrega estilos según sea necesario para tu gráfica de barras */
+    }
+
+    .totals-box {
+        background-color: #3498db67;
+        color: #fff;
+        padding: 20px;
+        margin-top: 20px; /* Ajusta la separación según sea necesario */
+        text-align: center;
+    }
+
+    .totals-box p {
+        font-size: 18px;
+        font-weight: bold;
+        margin-bottom: 10px;
+    }
+
+    .btn {
+        margin-top: 10px; /* Ajusta la separación según sea necesario */
+    }
+    body {
+        background-color: #e1f1fd;
+        margin: 0;
+    }
+    .btn-add {
+        position: fixed;
+        bottom: 50px;
+        right: 50px;
+        z-index: 1000;
+        width: 50px;
+        height: 50px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        overflow: hidden;
+    }
+
+    .btn-add .icon {
+        font-size: 24px;
+        color: white;
+        text-decoration: none;
+        position: relative;
+        top: -1px;
+        z-index: 1;
+    }
+
+    .btn-add .background {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        border-radius: 50%;
+        background-color: #B4ADEA;
+        transition: background-color 0.3s ease;
+    }
+
+    .btn-add:hover .background {
+        background-color: #8568B2;
+    }
+</style>
+
+<!-- Botón flotante para la edición del anuncio -->
+<a class="btn-add" id="editButton">
+    <span class="icon"><i class="fas fa-pen"></i></span>
+    <span class="background"></span>
+</a>
+<!-- Agrega esto al final de tu archivo HTML, antes de cerrar el bloque body -->
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        // Manejar el clic en el botón de edición
+        document.getElementById('editButton').addEventListener('click', function () {
+            // Abre el modal de edición
+            $('#editModal').modal('show');
+        });
+    });
+</script>
+
+<!-- Agrega un modal al final de tu archivo HTML -->
+<div class="modal fade" id="editModal" tabindex="-1" role="dialog" aria-labelledby="editModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="editModalLabel">Editar Pantalla</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <!-- Formulario de edición utilizando Django Crispy Forms para un diseño más elegante -->
+                {% load crispy_forms_tags %}
+                <form id="editForm" method="post" enctype="multipart/form-data" action="{% url 'editar_pantalla' pantalla.id %}">
+                    {% csrf_token %}
+                    {{ form|crispy }}
+                    <button type="submit" class="btn btn-primary">Guardar cambios</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+ <!-- Nuevo cuadro con las especificaciones adicionales -->
+ <div class="card" style="margin-top: 20px;">
+    <div class="card-body d-flex">
+        <div class="reel-container" style=" width: 280px; height: 260px; flex-shrink: 0; border-right: 1px solid #ccc; padding-right: 20px;">
+            <div class="reel-left">
+                <p>reel</p>
+                <hr>
+                <ul>
+                    <li>activos</li>
+                    <li>vencidos</li>
+                    <li>futuros</li>
+                    <li>todas</li>
+                </ul>
+            </div>
+        </div>
+        <div class="reel-container" style="width: 1340px; height: 300px; flex-shrink: 0;padding-left: 20px">
+            <div class="reel-right">
+                <h5>Anuncios</h5>
+                <div class="pantallas-container">
+                    <div class="pantalla-icon">
+                        <!-- Icono de ojo tachado -->
+                        <i class="fas fa-eye-slash"></i>
+                    </div>
+                    <hr>
+                    <p>No hay Anuncios para mostrar</p>
+                </div>
+                <div class="pantalla-button">
+                    <a href="{% url 'crear_cms_evento' %}">
+                        <button class="btn btn-primary">Agregar Anuncio</button>
+                    </a>
+                </div>
+                
+            </div>
+        </div>
+    </div>
+</div>
+</div>
+
+{% endblock %}

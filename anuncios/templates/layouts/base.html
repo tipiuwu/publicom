@@ -1,0 +1,181 @@
+{% load bootstrap4 %}
+{% load static %}
+{% load humanize %} <!-- Agregamos la carga para el módulo 'humanize' -->
+
+<!DOCTYPE html>
+<html lang="es">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>{% block title %}Mi Sitio{% endblock %}</title>
+        <link rel="stylesheet"
+            href="{% static 'C:\Users\cgh34\Desktop\publicom\proyecto\anuncios\static\css\estilos.css' %}">
+        <link rel="stylesheet"
+            href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+        <link rel="stylesheet"
+            href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
+            integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T"
+            crossorigin="anonymous">
+        <script
+            src="https://maps.googleapis.com/maps/api/js?key=TU_CLAVE_API_AQUI&libraries=places"></script>
+        <style>
+        /* static/css/style.css */
+
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+}   
+
+
+.header {
+    background-color: #058a99;
+    color: #fff;
+    padding: 10px;
+    text-align: center;
+}
+
+.header img {
+    width: 50px; /* Ajusta el tamaño de la imagen según tus necesidades */
+    height: 50px;
+}
+
+.options {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    background-color: #e1f1fd;
+    padding: 10px;
+}
+
+.option {
+    text-align: center;
+}
+
+.option img {
+    width: 30px; /* Ajusta el tamaño del ícono según tus necesidades */
+    height: 30px;
+}
+
+.content {
+    padding: 20px;
+}
+
+.full-width-table {
+    width: 100%;
+}
+
+    .header {
+        display: flex;
+        align-items: center;
+    }
+
+    .header img {
+        margin-right: 5px;
+        width: 40px; /* Ajusta el ancho del logo según tus necesidades */
+        height: auto; /* Mantiene la proporción del logo */
+    }
+
+    .header h5 {
+        font-size: 18px; /* Ajusta el tamaño del texto según tus necesidades */
+        margin: 0; /* Elimina el margen del texto para alinear con el logo */
+    }
+
+    .options {
+        display: flex;
+        align-items: center; /* Centra verticalmente los elementos dentro de .options */
+        justify-content: flex-start; /* Mueve los elementos hacia la derecha */
+        margin-top: 5px; /* Ajusta la separación superior */
+        margin-bottom: 5px; /* Ajusta la separación inferior */
+        background-color: #fff;
+        padding: 0px;
+        border-bottom: 1px solid #ccc; /* Añade un borde inferior a la barra de opciones */
+    }
+    .option {
+        text-align: center;
+        margin-left: 10px; /* Ajusta el margen izquierdo entre los iconos */
+        background-color: #fff;
+        padding: 5px; /* Ajusta el espaciado interno */
+        border-radius: 8px;
+    }
+
+    .option i {
+        font-size: 20px; /* Tamaño de los iconos */
+        width: 20px; /* Ancho de los iconos */
+        height: 21px; /* Altura de los iconos */
+        color: #3498db;
+        margin-top: 5px; /* Ajusta el espacio desde la parte superior del icono */
+        margin-bottom: 5px; /* Ajusta el espacio desde la parte inferior del icono */
+    }
+
+    .option p {
+        margin: 0; /* Elimina el margen para alinear con el icono */
+    }
+
+    .content {
+        margin-top: 20px; /* Ajusta el espacio entre la barra del menú y el contenido principal */
+        padding: 20px; /* Ajusta el espaciado interno del contenido principal */
+    }
+    </style>
+    </head>
+    <body>
+        <div class="header">
+            <img src="{% static 'images/publicom.png' %}" alt="Logo">
+            <h5>publicom</h5>
+        </div>
+        <div class="options">
+            <div class="option">
+                <!-- Icono para Resumen -->
+                <p></p>
+            </div>
+            <div class="option">
+                <a href="{% url 'resumen' %}">
+                    <i class="fas fa-chart-bar"></i><!-- Icono para Resumen -->
+                    <p>Dash board</p>
+                </a>
+            </div>
+            <div class="option">
+                <a href="{% url 'lista_pantallas' %}">
+                    <i class="fas fa-desktop"></i> <!-- Icono para Pantallas -->
+                    <p>CMS</p>
+                </a>
+            </div>
+            <div class="option">
+                <a href="{% url 'lista_anuncios' %}">
+                    <i class="fa fa-bullhorn"></i> <!-- Icono para Anuncios -->
+                    <p>Contenidos</p>
+                </a>
+            </div>
+            <div class="option">
+                <i class="fa fa-desktop"></i> <!-- Icono para Sincro -->
+                <p>Sincro</p>
+            </div>
+            <div class="option">
+                <i class="fa fa-flag"></i> <!-- Icono para Campañas -->
+                <p>Campañas</p>
+            </div>
+            <div class="option">
+                <i class="fa fa-desktop"></i> <!-- Icono para Reportes -->
+                <p>Reportes</p>
+            </div>
+            <div class="option">
+                <i class="fa fa-users"></i> <!-- Icono para Usuarios -->
+                <p>Usuarios</p>
+            </div>
+        </div>
+
+        <div class="content">
+            {% block content %}{% endblock content %}
+            {% include 'includes/footer.html' %}
+        </div>
+
+        <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
+            integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"
+            crossorigin="anonymous"></script>
+        <script
+            src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"
+            integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM"
+            crossorigin="anonymous"></script>
+
+        {% block javascripts %}{% endblock javascripts %}
+    </body>
+</html>
